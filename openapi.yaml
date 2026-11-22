@@ -1,0 +1,197 @@
+openapi: 3.0.0
+info:
+  title: API de Cifra de César
+  description: "API para cifrar e decifrar mensagens usando a Cifra de César. O alfabeto utilizado é: a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z. Os espaços devem aparecer nas respostas. Caracteres fora do alfabeto (espaços, pontuação, dígitos) são preservados na mesma posição."
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000
+    description: Execução local
+
+paths:
+  /cifrar:
+    post:
+      summary: "Cifra uma mensagem usando a Cifra de César"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CifrarRequest'
+      responses:
+        '200':
+          description: "Mensagem cifrada com sucesso"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CifrarResponse'
+        '400':
+          description: "Requisição inválida"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErroResponse'
+
+  /decifrar:
+    post:
+      summary: "Decifra uma mensagem cifrada usando a Cifra de César"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DecifrarRequest'
+      responses:
+        '200':
+          description: "Mensagem decifrada com sucesso"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecifrarResponse'
+        '400':
+          description: "Requisição inválida"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErroResponse'
+
+  /decifrarForcaBruta:
+    post:
+      summary: "Decifra uma mensagem cifrada que não possui a informação de deslocamento, utilizando força bruta na Cifra de César. Adotar o idioma português como o único idioma aceito."
+      parameters:
+        - in: query
+          name: detalhado
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: "Quando true, a resposta também traz o deslocamento encontrado e os 26 candidatos ordenados por pontuação."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DecifrarForcaBrutaRequest'
+      responses:
+        '200':
+          description: "Mensagem decifrada com sucesso"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecifrarForcaBrutaResponse'
+        '400':
+          description: "Requisição inválida"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErroResponse'
+
+  /health:
+    get:
+      summary: "Verifica se a API está disponível"
+      responses:
+        '200':
+          description: "API disponível"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ok"
+
+components:
+  schemas:
+    CifrarRequest:
+      type: object
+      required:
+        - textoClaro
+        - deslocamento
+      properties:
+        textoClaro:
+          type: string
+          maxLength: 255
+          example: "ola mundo"
+        deslocamento:
+          type: integer
+          example: 3
+
+    CifrarResponse:
+      type: object
+      properties:
+        textoCifrado:
+          type: string
+          maxLength: 255
+          example: "rod pxqgr"
+
+    DecifrarRequest:
+      type: object
+      required:
+        - textoCifrado
+        - deslocamento
+      properties:
+        textoCifrado:
+          type: string
+          maxLength: 255
+          example: "rod pxqgr"
+        deslocamento:
+          type: integer
+          example: 3
+
+    DecifrarResponse:
+      type: object
+      properties:
+        textoClaro:
+          type: string
+          maxLength: 255
+          example: "ola mundo"
+
+    DecifrarForcaBrutaRequest:
+      type: object
+      required:
+        - textoCifrado
+      properties:
+        textoCifrado:
+          type: string
+          maxLength: 255
+          example: "rod pxqgr"
+
+    DecifrarForcaBrutaResponse:
+      type: object
+      properties:
+        textoClaro:
+          type: string
+          maxLength: 255
+          example: "ola mundo"
+        deslocamento:
+          type: integer
+          description: "Presente apenas quando a requisição usa ?detalhado=true."
+          example: 3
+        candidatos:
+          type: array
+          description: "Presente apenas quando a requisição usa ?detalhado=true."
+          items:
+            type: object
+            properties:
+              deslocamento:
+                type: integer
+                example: 3
+              texto:
+                type: string
+                example: "ola mundo"
+              pontuacao:
+                type: number
+                example: 985.42
+
+    ErroResponse:
+      type: object
+      properties:
+        erro:
+          type: string
+          example: "Requisicao invalida"
+        detalhes:
+          type: array
+          items:
+            type: string
+          example: ["O campo \"deslocamento\" e obrigatorio."]

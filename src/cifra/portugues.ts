@@ -1,0 +1,99 @@
+/**
+ * Modelo estatistico simples do idioma portugues, usado para escolher o
+ * candidato mais provavel durante o ataque de forca bruta.
+ *
+ * Como o alfabeto da cifra e apenas a-z, todas as palavras da lista abaixo
+ * estao escritas sem acentos e sem cedilha.
+ */
+
+/** Frequencia relativa (%) de cada letra em textos em portugues. */
+export const FREQUENCIA_PORTUGUES: Readonly<Record<string, number>> = {
+  a: 14.63, b: 1.04, c: 3.88, d: 4.99, e: 12.57, f: 1.02,
+  g: 1.30, h: 1.28, i: 6.18, j: 0.40, k: 0.02, l: 2.78,
+  m: 4.74, n: 5.05, o: 10.73, p: 2.52, q: 1.20, r: 6.53,
+  s: 7.81, t: 4.34, u: 4.63, v: 1.67, w: 0.01, x: 0.21,
+  y: 0.01, z: 0.47,
+};
+
+/** Palavras frequentes do portugues (sem acentuacao). */
+export const PALAVRAS_PORTUGUES: ReadonlySet<string> = new Set([
+  // Artigos, preposicoes, conjuncoes e pronomes
+  'a', 'o', 'as', 'os', 'um', 'uma', 'uns', 'umas',
+  'de', 'do', 'da', 'dos', 'das', 'em', 'no', 'na', 'nos', 'nas',
+  'ao', 'aos', 'por', 'pelo', 'pela', 'para', 'com', 'sem', 'sob', 'sobre',
+  'ate', 'apos', 'entre', 'contra', 'desde', 'durante',
+  'que', 'qual', 'quais', 'quem', 'quando', 'onde', 'como', 'porque',
+  'se', 'e', 'ou', 'mas', 'nem', 'nao', 'sim', 'ja', 'ainda',
+  'muito', 'muita', 'pouco', 'pouca', 'mais', 'menos', 'tao', 'tambem',
+  'so', 'apenas', 'todo', 'toda', 'todos', 'todas',
+  'outro', 'outra', 'outros', 'outras', 'mesmo', 'mesma', 'cada',
+  'algum', 'alguma', 'alguns', 'algumas', 'nenhum', 'nada', 'tudo',
+  'isso', 'isto', 'aquilo', 'este', 'esta', 'estes', 'estas',
+  'esse', 'essa', 'esses', 'essas', 'aquele', 'aquela',
+  'eu', 'tu', 'voce', 'voces', 'ele', 'ela', 'eles', 'elas', 'vos',
+  'me', 'te', 'lhe', 'lhes', 'meu', 'minha', 'teu', 'tua', 'seu', 'sua',
+  'nosso', 'nossa', 'dele', 'dela', 'deles', 'delas',
+
+  // Verbos de alta frequencia
+  'ser', 'sou', 'somos', 'sao', 'era', 'eram', 'foi', 'fui', 'foram',
+  'sera', 'serao', 'sendo', 'sido',
+  'estar', 'estou', 'estamos', 'estao', 'estava', 'estavam', 'esteve',
+  'ter', 'tenho', 'tem', 'temos', 'tinha', 'tinham', 'teve', 'tive', 'tera',
+  'haver', 'havia', 'houve',
+  'fazer', 'faco', 'faz', 'fazem', 'fez', 'feito', 'fazia',
+  'dizer', 'digo', 'diz', 'disse', 'dito',
+  'poder', 'pode', 'podem', 'podia', 'pude', 'podera',
+  'ir', 'vou', 'vai', 'vamos', 'vao', 'ia', 'iam',
+  'vir', 'vem', 'veio', 'vieram', 'ver', 'vejo', 've', 'vemos', 'viu', 'visto',
+  'dar', 'dou', 'dao', 'deu', 'dado',
+  'saber', 'sei', 'sabe', 'sabem', 'soube',
+  'querer', 'quero', 'quer', 'queremos', 'querem', 'queria',
+  'ficar', 'fica', 'ficam', 'ficou', 'passar', 'passa', 'passou',
+  'chegar', 'chega', 'chegou', 'deixar', 'deixa', 'deixou',
+  'falar', 'fala', 'falou', 'achar', 'acha', 'achou',
+  'precisar', 'precisa', 'trabalhar', 'trabalha', 'viver', 'vive',
+  'ajudar', 'ajuda', 'usar', 'usa', 'pensar', 'pensa',
+  'encontrar', 'encontra', 'comecar', 'comeca', 'entender', 'entende',
+  'criar', 'cria', 'enviar', 'envia', 'receber', 'recebe',
+  'mostrar', 'mostra', 'chamar', 'chama', 'levar', 'leva',
+  'trazer', 'traz', 'abrir', 'abre', 'fechar', 'fecha',
+  'cifrar', 'cifra', 'decifrar', 'decifra', 'quebrar', 'quebra',
+
+  // Substantivos de alta frequencia
+  'ola', 'mundo', 'casa', 'tempo', 'dia', 'dias', 'noite', 'tarde', 'manha',
+  'ano', 'anos', 'mes', 'meses', 'hora', 'horas', 'vez', 'vezes',
+  'vida', 'pessoa', 'pessoas', 'gente', 'homem', 'mulher',
+  'menino', 'menina', 'crianca', 'amigo', 'amiga', 'familia',
+  'pai', 'mae', 'filho', 'filha', 'irmao', 'irma',
+  'trabalho', 'escola', 'aula', 'professor', 'aluno', 'alunos',
+  'livro', 'livros', 'texto', 'palavra', 'palavras',
+  'mensagem', 'mensagens', 'nome', 'numero', 'parte', 'lugar',
+  'cidade', 'pais', 'estado', 'rua', 'agua', 'fogo', 'terra',
+  'sol', 'lua', 'ceu', 'mar', 'rio', 'carro', 'rede',
+  'computador', 'sistema', 'programa', 'projeto', 'codigo',
+  'chave', 'senha', 'dados', 'informacao', 'seguranca',
+  'criptografia', 'teste', 'exemplo', 'forma', 'modo', 'caso',
+  'coisa', 'coisas', 'problema', 'solucao', 'ponto', 'grupo',
+  'atividade', 'resposta', 'pergunta', 'verdade', 'amor', 'paz',
+  'forca', 'bruta', 'alfabeto', 'letra', 'letras', 'deslocamento',
+
+  // Adjetivos e adverbios de alta frequencia
+  'bom', 'boa', 'bons', 'boas', 'mau', 'melhor', 'pior',
+  'grande', 'grandes', 'pequeno', 'pequena',
+  'novo', 'nova', 'novos', 'novas', 'velho', 'velha',
+  'primeiro', 'primeira', 'ultimo', 'ultima',
+  'certo', 'certa', 'errado', 'errada', 'facil', 'dificil',
+  'rapido', 'lento', 'alto', 'baixo', 'forte', 'fraco',
+  'longe', 'perto', 'aqui', 'ali', 'la', 'hoje', 'amanha', 'ontem',
+  'agora', 'sempre', 'nunca', 'antes', 'depois',
+  'bem', 'mal', 'assim', 'entao', 'talvez', 'claro', 'seguro', 'cifrado',
+]);
+
+/** Bigramas mais comuns do portugues, usados como sinal auxiliar. */
+export const BIGRAMAS_PORTUGUES: ReadonlySet<string> = new Set([
+  'de', 'es', 'os', 'as', 'ra', 'do', 'ar', 'co', 'qu', 'en',
+  're', 'te', 'se', 'an', 'ad', 'ca', 'ma', 'me', 'ta', 'to',
+  'na', 'da', 'ro', 'al', 'in', 'er', 'ia', 'nt', 'st', 'ou',
+  'ei', 'ue', 'or', 'ri', 'li', 'pa', 'le', 'is', 'mo', 'no',
+  'ss', 'ec', 'el', 'ni', 'un', 'ti', 'ic', 'ap', 'am', 'ol',
+]);
