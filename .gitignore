@@ -22,3 +22,6 @@ Thumbs.db
 
 # Pacote de entrega
 *.zip
+
+# Material de apoio do professor (nao faz parte da entrega)
+*.pdf
