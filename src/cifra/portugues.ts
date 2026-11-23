@@ -1,12 +1,3 @@
-/**
- * Modelo estatistico simples do idioma portugues, usado para escolher o
- * candidato mais provavel durante o ataque de forca bruta.
- *
- * Como o alfabeto da cifra e apenas a-z, todas as palavras da lista abaixo
- * estao escritas sem acentos e sem cedilha.
- */
-
-/** Frequencia relativa (%) de cada letra em textos em portugues. */
 export const FREQUENCIA_PORTUGUES: Readonly<Record<string, number>> = {
   a: 14.63, b: 1.04, c: 3.88, d: 4.99, e: 12.57, f: 1.02,
   g: 1.30, h: 1.28, i: 6.18, j: 0.40, k: 0.02, l: 2.78,
@@ -15,9 +6,7 @@ export const FREQUENCIA_PORTUGUES: Readonly<Record<string, number>> = {
   y: 0.01, z: 0.47,
 };
 
-/** Palavras frequentes do portugues (sem acentuacao). */
 export const PALAVRAS_PORTUGUES: ReadonlySet<string> = new Set([
-  // Artigos, preposicoes, conjuncoes e pronomes
   'a', 'o', 'as', 'os', 'um', 'uma', 'uns', 'umas',
   'de', 'do', 'da', 'dos', 'das', 'em', 'no', 'na', 'nos', 'nas',
   'ao', 'aos', 'por', 'pelo', 'pela', 'para', 'com', 'sem', 'sob', 'sobre',
@@ -33,8 +22,6 @@ export const PALAVRAS_PORTUGUES: ReadonlySet<string> = new Set([
   'eu', 'tu', 'voce', 'voces', 'ele', 'ela', 'eles', 'elas', 'vos',
   'me', 'te', 'lhe', 'lhes', 'meu', 'minha', 'teu', 'tua', 'seu', 'sua',
   'nosso', 'nossa', 'dele', 'dela', 'deles', 'delas',
-
-  // Verbos de alta frequencia
   'ser', 'sou', 'somos', 'sao', 'era', 'eram', 'foi', 'fui', 'foram',
   'sera', 'serao', 'sendo', 'sido',
   'estar', 'estou', 'estamos', 'estao', 'estava', 'estavam', 'esteve',
@@ -58,8 +45,6 @@ export const PALAVRAS_PORTUGUES: ReadonlySet<string> = new Set([
   'mostrar', 'mostra', 'chamar', 'chama', 'levar', 'leva',
   'trazer', 'traz', 'abrir', 'abre', 'fechar', 'fecha',
   'cifrar', 'cifra', 'decifrar', 'decifra', 'quebrar', 'quebra',
-
-  // Substantivos de alta frequencia
   'ola', 'mundo', 'casa', 'tempo', 'dia', 'dias', 'noite', 'tarde', 'manha',
   'ano', 'anos', 'mes', 'meses', 'hora', 'horas', 'vez', 'vezes',
   'vida', 'pessoa', 'pessoas', 'gente', 'homem', 'mulher',
@@ -76,8 +61,6 @@ export const PALAVRAS_PORTUGUES: ReadonlySet<string> = new Set([
   'coisa', 'coisas', 'problema', 'solucao', 'ponto', 'grupo',
   'atividade', 'resposta', 'pergunta', 'verdade', 'amor', 'paz',
   'forca', 'bruta', 'alfabeto', 'letra', 'letras', 'deslocamento',
-
-  // Adjetivos e adverbios de alta frequencia
   'bom', 'boa', 'bons', 'boas', 'mau', 'melhor', 'pior',
   'grande', 'grandes', 'pequeno', 'pequena',
   'novo', 'nova', 'novos', 'novas', 'velho', 'velha',
@@ -89,7 +72,6 @@ export const PALAVRAS_PORTUGUES: ReadonlySet<string> = new Set([
   'bem', 'mal', 'assim', 'entao', 'talvez', 'claro', 'seguro', 'cifrado',
 ]);
 
-/** Bigramas mais comuns do portugues, usados como sinal auxiliar. */
 export const BIGRAMAS_PORTUGUES: ReadonlySet<string> = new Set([
   'de', 'es', 'os', 'as', 'ra', 'do', 'ar', 'co', 'qu', 'en',
   're', 'te', 'se', 'an', 'ad', 'ca', 'ma', 'me', 'ta', 'to',

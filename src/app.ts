@@ -1,8 +1,3 @@
-/**
- * Montagem da aplicacao Express: rotas da Cifra de Cesar, documentacao
- * Swagger e tratamento de erros.
- */
-
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -17,14 +12,8 @@ import { decifrarPorForcaBruta } from './cifra/forcaBruta.js';
 import { cifrarSchema, decifrarForcaBrutaSchema, decifrarSchema } from './schemas.js';
 
 const diretorioAtual = dirname(fileURLToPath(import.meta.url));
+const caminhoEspecificacao = resolve(diretorioAtual, '..', 'openapi.yaml');
 
-/** Le a especificacao OpenAPI da raiz do projeto (vale para src/ e dist/). */
-function carregarEspecificacao(): unknown {
-  const caminho = resolve(diretorioAtual, '..', 'openapi.yaml');
-  return parseYaml(readFileSync(caminho, 'utf8'));
-}
-
-/** Resposta de erro 400 no formato usado por toda a API. */
 function requisicaoInvalida(res: Response, mensagens: string[]): void {
   res.status(400).json({ erro: 'Requisicao invalida', detalhes: mensagens });
 }
@@ -34,14 +23,13 @@ export function criarApp() {
 
   app.use(express.json({ limit: '64kb' }));
 
-  // Documentacao interativa da API.
-  const especificacao = carregarEspecificacao();
+  const especificacao = parseYaml(readFileSync(caminhoEspecificacao, 'utf8'));
   app.use('/docs', swaggerUi.serve, swaggerUi.setup(especificacao as never));
+
   app.get('/openapi.yaml', (_req, res) => {
-    res.type('text/yaml').send(readFileSync(resolve(diretorioAtual, '..', 'openapi.yaml'), 'utf8'));
+    res.type('text/yaml').send(readFileSync(caminhoEspecificacao, 'utf8'));
   });
 
-  // Verificacao de disponibilidade (util para o servico de hospedagem).
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok' });
   });
@@ -54,7 +42,6 @@ export function criarApp() {
     });
   });
 
-  // POST /cifrar - cifra uma mensagem com o deslocamento informado.
   app.post('/cifrar', (req, res) => {
     const resultado = cifrarSchema.safeParse(req.body);
     if (!resultado.success) {
@@ -65,7 +52,6 @@ export function criarApp() {
     return res.status(200).json({ textoCifrado: cifrar(textoClaro, deslocamento) });
   });
 
-  // POST /decifrar - decifra uma mensagem com o deslocamento informado.
   app.post('/decifrar', (req, res) => {
     const resultado = decifrarSchema.safeParse(req.body);
     if (!resultado.success) {
@@ -76,9 +62,6 @@ export function criarApp() {
     return res.status(200).json({ textoClaro: decifrar(textoCifrado, deslocamento) });
   });
 
-  // POST /decifrarForcaBruta - testa os 26 deslocamentos e escolhe o mais
-  // provavel de ser portugues. Com ?detalhado=true, devolve tambem o
-  // deslocamento encontrado e todos os candidatos ordenados.
   app.post('/decifrarForcaBruta', (req, res) => {
     const resultado = decifrarForcaBrutaSchema.safeParse(req.body);
     if (!resultado.success) {
@@ -106,7 +89,6 @@ export function criarApp() {
     res.status(404).json({ erro: 'Endpoint nao encontrado', documentacao: '/docs' });
   });
 
-  // JSON malformado e erros de validacao viram 400; o resto, 500.
   app.use((erro: unknown, _req: Request, res: Response, _next: NextFunction) => {
     if (erro instanceof ZodError) {
       return requisicaoInvalida(res, erro.issues.map((i) => i.message));

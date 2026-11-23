@@ -1,8 +1,3 @@
-/**
- * Validacao dos corpos de requisicao, conforme a especificacao OpenAPI da
- * atividade (campos obrigatorios, tipos e maxLength de 255).
- */
-
 import { z } from 'zod';
 
 const TAMANHO_MAXIMO = 255;
@@ -15,10 +10,6 @@ const texto = (campo: string) =>
     })
     .max(TAMANHO_MAXIMO, `O campo "${campo}" deve ter no maximo ${TAMANHO_MAXIMO} caracteres.`);
 
-/**
- * Aceita um inteiro ou uma string que represente um inteiro (ex.: "3"),
- * para tolerar clientes que enviem o deslocamento como texto.
- */
 const deslocamento = z.preprocess(
   (valor) => {
     if (typeof valor === 'string' && valor.trim() !== '' && Number.isInteger(Number(valor))) {
